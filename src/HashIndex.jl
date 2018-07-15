@@ -15,7 +15,7 @@ function HashIndex(a::AbstractArray)
     return HashIndex(dict)
 end
 
-Base.summary(::HashIndex) = "HashIndex"
+Base.summary(dict::HashIndex) = "HashIndex ($length(dict) unique values)"
 
 # Accelerations
 function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
