@@ -1,0 +1,6 @@
+authors = ["Andy Ferris <andy.ferris@roames.com.au>"]
+name = "AcceleratedArrays"
+uuid = "e92fd2e2-8724-11e8-05dd-b992f99834d6"
+version = "0.1.0"
+
+[deps]
