@@ -15,8 +15,8 @@ Base.size(a::AcceleratedArray) = size(parent(a))
 	getindex(parent(a), inds...)
 end
 
-function Base.summary(a::AcceleratedArray)
-	string(summary(parent(a)), " + ", summary(a.index))
+function Base.summary(io::IO, a::AcceleratedArray)
+	print(io, summary(parent(a)), " + ", summary(a.index))
 end
 
 # Disable mutation for now... simplifies the acceleration indices
