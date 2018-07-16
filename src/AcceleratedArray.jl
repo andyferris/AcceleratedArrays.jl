@@ -20,9 +20,3 @@ function Base.summary(a::AcceleratedArray)
 end
 
 # Disable mutation for now... simplifies the acceleration indices
-#=
-@propagate_inbounds Base.setindex!(a::AcceleratedArray, v, i::Int) = getindex(parent(a), v, i)
-@propagate_inbounds function Base.getindex(a::AcceleratedArray{<:Any, N}, v, inds::VarArg{Int, N}) where {N}
-	setindex!(parent(a), v, inds...)
-end
-=#

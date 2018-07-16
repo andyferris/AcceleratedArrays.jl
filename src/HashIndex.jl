@@ -15,7 +15,10 @@ function HashIndex(a::AbstractArray)
     return HashIndex(dict)
 end
 
-Base.summary(dict::HashIndex) = "HashIndex ($length(dict) unique values)"
+# TODO: accelerate! by put elements in order so we can use ranges as dict values and dict
+#       iteration mirrors array iteration for cache friendliness?
+
+Base.summary(dict::HashIndex) = "HashIndex ($(length(dict)) unique  element$(length(dict) == 1 ? "" : "s"))"
 
 # Accelerations
 function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
@@ -27,6 +30,8 @@ function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any
 	end
 end
 
+# TODO: findall for arbitrary predicates by just checking each unique key?
+
 function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
 	index = Base.ht_keyindex(a.index.dict, f.x)
 	if index < 0
@@ -35,6 +40,8 @@ function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any,
 		return @inbounds parent(a)[a.index.dict.vals[i]]
 	end
 end
+
+# TODO: filter for arbitrary predicates by just checking each unique key?
 
 function Base.unique(a::AcceleratedArray{T, <:Any, <:Any, <:HashIndex}) where {T}
 	out = Vector{T}()
