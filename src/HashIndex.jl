@@ -1,27 +1,30 @@
 # Hash table acceleration index
-struct HashIndex{D <: AbstractDict} <: AbstractIndex
+struct HashIndex{F, D <: AbstractDict} <: AbstractIndex
+	f::F
     dict::D
 end
 
-function HashIndex(a::AbstractArray)
-	dict = Dict{eltype(a), Vector{eltype(keys(a))}}()
+HashIndex(a::AbstractArray) = HashIndex(identity, a)
+
+function HashIndex(f, a::AbstractArray)
+	dict = Dict{promote_op(f, eltype(a)), Vector{eltype(keys(a))}}()
     
     @inbounds for i in keys(a)
         value = a[i]
-        vector = get!(Vector{eltype(keys(a))}, dict, value)
+        vector = get!(Vector{eltype(keys(a))}, dict, f(value))
         push!(vector, i)
     end
 
-    return HashIndex(dict)
+    return HashIndex(f, dict)
 end
 
 # TODO: accelerate! by put elements in order so we can use ranges as dict values and dict
 #       iteration mirrors array iteration for cache friendliness?
 
-Base.summary(dict::HashIndex) = "HashIndex ($(length(dict)) unique  element$(length(dict) == 1 ? "" : "s"))"
+Base.summary(i::HashIndex) = "HashIndex ($(length(i.dict)) unique  element$(length(i.dict) == 1 ? "" : "s"))"
 
 # Accelerations
-function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
+function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
 	index = Base.ht_keyindex(a.index.dict, f.x)
 	if index < 0
 		return Vector{eltype(keys(a))}()
@@ -30,9 +33,27 @@ function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any
 	end
 end
 
-# TODO: findall for arbitrary predicates by just checking each unique key?
+# TODO: findall for arbitrary predicates by just checking each unique key? (Sometimes faster, sometimes slower?)
 
-function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
+function Base.findfirst(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+	index = Base.ht_keyindex(a.index.dict, f.x)
+	if index < 0
+		return nothing
+	else
+		return @inbounds first(a.index.dict.vals[index])
+	end
+end
+
+function Base.findlast(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+	index = Base.ht_keyindex(a.index.dict, f.x)
+	if index < 0
+		return nothing
+	else
+		return @inbounds last(a.index.dict.vals[index])
+	end
+end
+
+function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
 	index = Base.ht_keyindex(a.index.dict, f.x)
 	if index < 0
 		return empty(a)
@@ -41,12 +62,59 @@ function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any,
 	end
 end
 
-# TODO: filter for arbitrary predicates by just checking each unique key?
+# TODO: filter for arbitrary predicates by just checking each unique key? (Sometimes faster, sometimes slower?)
 
-function Base.unique(a::AcceleratedArray{T, <:Any, <:Any, <:HashIndex}) where {T}
+function Base.unique(a::AcceleratedArray{T, <:Any, <:Any, <:HashIndex{typeof(identity)}}) where {T}
 	out = Vector{T}()
 	@inbounds for value in keys(a.index.dict)
 		push!(out, value)
 	end
 	return out
+end
+
+function SplitApplyCombine.group(::typeof(identity), f, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+	return Dict((key, @inbounds a[inds]) for (key, inds) in a.index.dict)
+end
+
+function SplitApplyCombine.groupreduce(::typeof(identity), op, f, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}}; kw...)
+	return Dict((k, mapreduce(i -> f(@inbounds a[i]), op, v; kw...)) for (k,v) in a.index.dict)
+end
+
+function SplitApplyCombine.groupinds(::typeof(identity), a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+	return a.index.dict
+end
+
+function SplitApplyCombine.leftgroupjoin(lkey, ::typeof(identity), f, ::typeof(isequal), left, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+    T = promote_op(f, eltype(left), eltype(right))
+    K = promote_op(lkey, eltype(left))
+
+    dict = right.index.dict
+    out = Dict{K, Vector{T}}()
+    for a ∈ left
+        key = lkey(a)
+        group = get!(() -> T[], out, key)
+        dict_index = Base.ht_keyindex(dict, key)
+        if dict_index > 0 # -1 if key not found
+            for b ∈ dict.vals[dict_index]
+                push!(group, f(a, b))
+            end
+        end
+    end
+    return out
+end
+
+function SplitApplyCombine.innerjoin(lkey, ::typeof(identity), f, ::typeof(isequal), left, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+    T = promote_op(f, eltype(left), eltype(right))
+    dict = right.index.dict
+    out = T[]
+    for a ∈ left
+        key = lkey(a)
+        dict_index = Base.ht_keyindex(dict, key)
+        if dict_index > 0 # -1 if key not found
+            for b ∈ dict.vals[dict_index]
+                push!(out, f(a, b))
+            end
+        end
+    end
+    return out
 end

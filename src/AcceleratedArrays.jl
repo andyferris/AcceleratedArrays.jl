@@ -1,6 +1,8 @@
 module AcceleratedArrays
 
-using Base: @propagate_inbounds, Fix2
+using SplitApplyCombine
+
+using Base: @propagate_inbounds, Fix2, promote_op
 
 export accelerate, accelerate!
 export AcceleratedArray, AcceleratedVector, AcceleratedMatrix, MaybeVector
@@ -19,3 +21,11 @@ include("SortIndex.jl")
 include("UniqueSortIndex.jl")
 
 end # module
+
+# TODO
+#
+# * Deal with <, ==, NaN, -0.0, missing, etc?
+# * findfirst, findlast, findnext, findprev (requires stable sort?)
+# * findmin, findmax (different behavior w.r.t NaN and missing?)
+# * group, groupview, groupinds, groupreduce
+# * leftgroupjoin
