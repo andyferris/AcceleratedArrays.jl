@@ -20,6 +20,24 @@ include("UniqueHashIndex.jl")
 include("SortIndex.jl")
 include("UniqueSortIndex.jl")
 
+include("spatialindex.jl")
+
+#= Base functionality =#
+#=
+function Base.setindex(a::AbstractVector{T}, v::T, i::Int) where {T}
+	out = similar(a)
+	@inbounds for ind in keys(a)
+        out[ind] = ifelse(ind == i, v, a[ind])
+	end
+    return out
+end
+
+Base.setindex(a::AbstractVector{T}, v, i::Int) where {T} = setindex(a, convert(T, v), i)
+
+import Base.setindex
+=#
+import Base.setindex
+
 end # module
 
 # TODO
