@@ -100,7 +100,7 @@ function SplitApplyCombine.leftgroupjoin(lkey, ::typeof(identity), f, ::typeof(i
     return out
 end
 
-function SplitApplyCombine.innerjoin(lkey, ::typeof(identity), f, ::typeof(isequal), left, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex{typeof(identity)}})
+function SplitApplyCombine.innerjoin(lkey, ::typeof(identity), f, ::typeof(isequal), left, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
     T = promote_op(f, eltype(left), eltype(right))
     dict = right.index.dict
     out = T[]
