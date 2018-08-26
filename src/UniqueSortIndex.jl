@@ -45,11 +45,35 @@ function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any
 end
 
 function Base.findall(f::Fix2{typeof(isless)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
-    @inbounds a.index.order[firstindex(a.index.order) : min(lastindex(a.index.order), searchsortedlast(view(parent(a), a.index.order), f.x))]
+    @inbounds a.index.order[firstindex(a.index.order) : min(lastindex(a.index.order), searchsortedlastless(view(parent(a), a.index.order), f.x))]
 end
 
 function Base.findall(f::Fix2{typeof(isless)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    @inbounds firstindex(parent(a)) : min(lastindex(parent(a)), searchsortedlastless(parent(a), f.x))
+end
+
+function Base.findall(f::Fix2{typeof(islessequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    @inbounds a.index.order[firstindex(a.index.order) : min(lastindex(a.index.order), searchsortedlast(view(parent(a), a.index.order), f.x))]
+end
+
+function Base.findall(f::Fix2{typeof(islessequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
     @inbounds firstindex(parent(a)) : min(lastindex(parent(a)), searchsortedlast(parent(a), f.x))
+end
+
+function Base.findall(f::Fix2{typeof(isgreater)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    @inbounds a.index.order[max(firstindex(a.index.order), searchsortedfirstgreater(view(parent(a), a.index.order), f.x)) : lastindex(a.index.order)]
+end
+
+function Base.findall(f::Fix2{typeof(isgreater)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    @inbounds max(firstindex(parent(a)), searchsortedfirstgreater(parent(a), f.x)) : lastindex(parent(a))
+end
+
+function Base.findall(f::Fix2{typeof(isgreaterequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    @inbounds a.index.order[max(firstindex(a.index.order), searchsortedfirst(view(parent(a), a.index.order), f.x)) : lastindex(a.index.order)]
+end
+
+function Base.findall(f::Fix2{typeof(isgreaterequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    @inbounds max(firstindex(parent(a)), searchsortedfirst(parent(a), f.x)) : lastindex(parent(a))
 end
 
 function Base.findall(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
@@ -79,11 +103,35 @@ function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any,
 end
 
 function Base.filter(f::Fix2{typeof(isless)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
-    @inbounds parent(a)[a.index.order[firstindex(a.index.order) : min(lastindex(a.index.order), searchsortedlast(view(parent(a), a.index.order), f.x))]]
+    @inbounds parent(a)[a.index.order[firstindex(a.index.order) : min(lastindex(a.index.order), searchsortedlastless(view(parent(a), a.index.order), f.x))]]
 end
 
 function Base.filter(f::Fix2{typeof(isless)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    @inbounds parent(a)[firstindex(parent(a)) : min(lastindex(parent(a)), searchsortedlastless(parent(a), f.x))]
+end
+
+function Base.filter(f::Fix2{typeof(islessequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    @inbounds parent(a)[a.index.order[firstindex(a.index.order) : min(lastindex(a.index.order), searchsortedlast(view(parent(a), a.index.order), f.x))]]
+end
+
+function Base.filter(f::Fix2{typeof(islessequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
     @inbounds parent(a)[firstindex(parent(a)) : min(lastindex(parent(a)), searchsortedlast(parent(a), f.x))]
+end
+
+function Base.filter(f::Fix2{typeof(isgreater)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    @inbounds parent(a)[a.index.order[max(firstindex(a.index.order), searchsortedfirstgreater(view(parent(a), a.index.order), f.x)) : lastindex(a.index.order)]]
+end
+
+function Base.filter(f::Fix2{typeof(isgreater)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    @inbounds parent(a)[max(firstindex(parent(a)), searchsortedfirstgreater(parent(a), f.x)) : lastindex(parent(a))]
+end
+
+function Base.filter(f::Fix2{typeof(isgreaterequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    @inbounds parent(a)[a.index.order[max(firstindex(a.index.order), searchsortedfirst(view(parent(a), a.index.order), f.x)) : lastindex(a.index.order)]]
+end
+
+function Base.filter(f::Fix2{typeof(isgreaterequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    @inbounds parent(a)[max(firstindex(parent(a)), searchsortedfirst(parent(a), f.x)) : lastindex(parent(a))]
 end
 
 function Base.filter(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})

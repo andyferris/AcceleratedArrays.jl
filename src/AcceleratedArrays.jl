@@ -7,6 +7,7 @@ using Base: @propagate_inbounds, Fix2, promote_op
 export accelerate, accelerate!
 export AcceleratedArray, AcceleratedVector, AcceleratedMatrix, MaybeVector
 export AbstractIndex, AbstractUniqueIndex, HashIndex, UniqueHashIndex, SortIndex, UniqueSortIndex
+export islessequal, isgreater, isgreaterequal
 
 include("predicates.jl") # Add some predicates that are "missing" from Base
 include("MaybeVector.jl")
