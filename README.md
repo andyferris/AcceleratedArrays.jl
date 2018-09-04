@@ -2,7 +2,7 @@
 
 *Arrays with acceleration indices.*
 
-This package provides (seconday) acceleration indexes for Julia `AbstractArray`s. Such
+This package provides (secondary) acceleration indexes for Julia `AbstractArray`s. Such
 acceleration indexes can be used to speed up certain operations, particularly those
 involving searching through the values - for example, an `AcceleratedArray` may have more
 efficient implementations of functions such as `findall`, `filter`, and `unique`.
