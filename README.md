@@ -1,11 +1,12 @@
 # AcceleratedArrays.jl
 
 *Arrays with acceleration indices.*
+
 [![Build Status](https://travis-ci.org/andyferris/AcceleratedArrays.jl.svg?branch=master)](https://travis-ci.org/andyferris/AcceleratedArrays.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/9qwb219wpdm3dg3c?svg=true)](https://ci.appveyor.com/project/andyferris/acceleratedarrays-jl)
 [![codecov](https://codecov.io/gh/andyferris/AcceleratedArrays.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/andyferris/AcceleratedArrays.jl)
 
-This package provides (seconday) acceleration indexes for Julia `AbstractArray`s. Such
+**AcceleratedArrays** provides (seconday) acceleration indexes for Julia `AbstractArray`s. Such
 acceleration indexes can be used to speed up certain operations, particularly those
 involving searching through the values - for example, an `AcceleratedArray` may have more
 efficient implementations of functions such as `findall`, `filter`, and `unique`.
@@ -115,11 +116,11 @@ inserted at the REPL via `\in <TAB>`). For example, `3 ∈ 0 .. 10` is `true` bu
 By default, an interval is inclusive of its endpoints, such that `10 ∈ 0 .. 10`. An endpoint
 can be excluded via the exclude function, for example `10 ∉ 0 .. exclude(10)`.
 
-#### Work remaining
+## Work remaining
 
 This package is still young, and could support some more features, such as:
 
  * Accelerate more functions, including those in `SplitApplyCombine`.
  * Figure out how to support `missing`, `==`, `<` with either a hash- or sort-based index.
- * Move `Interval`s into their own package, potentially reconcile with *IntervalSets.jl`
+ * Move `Interval`s into their own package, potentially reconcile with *IntervalSets.jl*
    (which currently uses `<=` and `>=` for comparisons).
