@@ -41,7 +41,7 @@ function isgreater(a, b)
     isless(b, a) || isequal(a, b)
 end
 
-function isgreatereqaul(a, b)
+function isgreaterequal(a, b)
     isless(b, a) || isequal(a, b)
 end
 

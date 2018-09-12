@@ -9,5 +9,5 @@
    @test filter(isequal(1.0), b)::MaybeVector{Float64} == [1.0]
    @test filter(isequal(4.0), b)::MaybeVector{Float64} == []
    
-   @test unique(b) ===  b
+   @test unique(b) === b
 end
