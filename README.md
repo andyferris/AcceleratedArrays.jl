@@ -46,6 +46,22 @@ findall(isequal("Bob"), a)
 # Return all the numbers in `b` between 40 and 60
 filter(in(40..60), b)
 ```
+## Accelerated functions
+
+Accelerations are fully implemented for the following functions, where `a` is an
+`AcceleratedArray`:
+
+ * `x ∈ a`
+ * `count(pred, a)`
+ * `findall(pred, a)`
+ * `filter(pred, a)`
+
+There is some work-in-progress on a variety of other functions, like `findfirst`,
+`findlast`, `unique`, and [SplitApplyCombine](https://github.com/JuliaData/SplitApplyCombine.jl)'s
+`group` and `innerjoin`.
+
+Accelerations are only available for some predicates `pred`, which naturally depend on the
+acceleration index used (see below for a full set).
 
 ## Acceleration Indexes
 
@@ -56,24 +72,27 @@ Generally, an index is created when the user calls `accelerate` or `accelerate!`
 
 This index constructs a hashmap between values in the array, and the corresponding array
 indices. For example, invoking `findall` to search for the locations of certain values
-will be reduced to a simple dictionary lookup.
+will be reduced to a simple dictionary lookup. Primarily accelerates commands using the
+`isequal` predicate.
 
 #### `UniqueHashIndex`
 
-Like `HashIndex`, except each value in the array will only appear once. Apart from
+Like `HashIndex`, except each value in the array can only appear once. Apart from
 guaranteeing uniqueness, certain operations may be faster with a `UniqueHashIndex` than 
 with a `HashIndex`.
 
 #### `SortIndex`
 
-This index determines the order of the elements (with respect to `isless`).
+This index determines the order of the elements (with respect to `isless`). This index
+can accelerate not only the `isequal` predicate, but a variety of other order-based
+predicates as well (see below).
 
 The `accelerate!` function will rearrange the input array, like `sort!`. This can speed
 up operations due to simplified algorithms and cache locality.
 
 #### `UniqueSortIndex`
 
-Like `SortIndex`, except each value in the array will only appear once. Apart from
+Like `SortIndex`, except each value in the array can only appear once. Apart from
 guaranteeing uniqueness, certain operations may be faster with a `UniqueSortIndex` than 
 with a `SortIndex`.
 
@@ -100,7 +119,7 @@ To make life easier, this package introduces a number of new convenience functio
 
 Any of these support "currying", which is a simple syntax for creating a closure such as
 `isequal(a) = (b -> isequal(a, b))`. Such curried predicates are picked up by multiple
-dispatch to accelerate operations like `findall(isqeual(3.0), accelerated_array)`.
+dispatch to accelerate operations like `findall(isequal(3.0), accelerated_array)`.
 
 ### Intervals
 
@@ -109,8 +128,8 @@ It is common to want to search for all values in a range. This package introduce
 `isless` and `isequal`).
 
 An interval is easily created with the `..` operator via the syntax `a .. b`. To find if
-a value is in this range, use the `in` function/operator (or `∈` operator, which can be
-inserted at the REPL via `\in <TAB>`). For example, `3 ∈ 0 .. 10` is `true` but
+a value is in this range, use the `in` function/operator (alternatively spelled `∈`, which
+can be inserted at the REPL via `\in <TAB>`). For example, `3 ∈ 0 .. 10` is `true` but
 `13 ∈ 0 .. 10` is `false`.
 
 By default, an interval is inclusive of its endpoints, such that `10 ∈ 0 .. 10`. An endpoint

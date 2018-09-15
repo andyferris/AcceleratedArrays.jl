@@ -18,9 +18,20 @@ end
 # TODO: accelerate! by put elements in order so we can use ranges as dict values and dict
 #       iteration mirrors array iteration for cache friendliness?
 
-Base.summary(i::HashIndex) = "HashIndex ($(length(i.dict)) unique  element$(length(i.dict) == 1 ? "" : "s"))"
+Base.summary(i::HashIndex) = "HashIndex ($(length(i.dict)) unique element$(length(i.dict) == 1 ? "" : "s"))"
 
 # Accelerations
+Base.in(x, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex}) = haskey(a.index.dict, x)
+
+function Base.count(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
+    index = Base.ht_keyindex(a.index.dict, f.x)
+    if index < 0
+        return 0
+    else
+        return length(a.index.dict.vals[index])
+    end
+end
+
 function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
 	index = Base.ht_keyindex(a.index.dict, f.x)
 	if index < 0
@@ -55,7 +66,7 @@ function Base.filter(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any,
 	if index < 0
 		return empty(a)
 	else
-		return @inbounds parent(a)[a.index.dict.vals[i]]
+		return @inbounds parent(a)[a.index.dict.vals[index]]
 	end
 end
 

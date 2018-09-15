@@ -31,7 +31,7 @@
     @test isequal(interval, 0.0 .. 1.0)
     @test isequal(0 .. 0, 0 .. 0)
     @test !isequal(0 .. 0, 1 .. 0)
-    @test !isequal(0 .. -1, 1 .. 0)
+    @test isequal(0 .. -1, 1 .. 0)
 
     @test isless(0..1, 2..3)
     @test !isless(2..3, 0..1)
@@ -43,10 +43,10 @@
     @test isless(0..0, 1..0)
     @test isless(0..0, 1 .. -1)
     @test isless(0..0, 0..1)
-    @test !isless(0..0, 0 .. -1)
+    @test isless(0..0, 0 .. -1)
     @test !isless(1..1, 0..0)
     @test !isless(1..0, 0..0)
     @test !isless(1 .. -1, 0..0)
     @test !isless(0..1, 0..0)
-    @test isless(0 .. -1, 0..0)
+    @test !(isless(0 .. -1, 0..0))
 end

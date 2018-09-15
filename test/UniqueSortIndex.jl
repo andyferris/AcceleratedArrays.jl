@@ -2,6 +2,51 @@
     a = [3.0, 2.0, 8.0, 5.0]
     b = accelerate(a, UniqueSortIndex)
 
+    @test 1.0 ∉ b
+    @test 2.0 ∈ b
+    @test 3.0 ∈ b
+    @test 4.0 ∉ b
+    @test 5.0 ∈ b
+    @test 8.0 ∈ b
+    @test 9.0 ∉ b
+
+    @test count(isequal(1.0), b) == 0
+    @test count(isequal(2.0), b) == 1
+    @test count(isequal(3.0), b) == 1
+    @test count(isequal(4.0), b) == 0
+    @test count(isequal(5.0), b) == 1
+    @test count(isequal(8.0), b) == 1
+    @test count(isequal(9.0), b) == 0
+
+    @test count(isless(1.1), b) == 0
+    @test count(isless(2.0), b) == 0
+    @test count(isless(2.1), b) == 1
+    @test count(isless(3.1), b) == 2
+    @test count(isless(8.1), b) == 4
+
+    @test count(islessequal(1.1), b) == 0
+    @test count(islessequal(2.0), b) == 1
+    @test count(islessequal(2.1), b) == 1
+    @test count(islessequal(3.1), b) == 2
+    @test count(islessequal(8.1), b) == 4
+
+    @test count(isgreater(1.1), b) == 4
+    @test count(isgreater(2.0), b) == 3
+    @test count(isgreater(2.1), b) == 3
+    @test count(isgreater(3.1), b) == 2
+    @test count(isgreater(8.1), b) == 0
+
+    @test count(isgreaterequal(1.1), b) == 4
+    @test count(isgreaterequal(2.0), b) == 4
+    @test count(isgreaterequal(2.1), b) == 3
+    @test count(isgreaterequal(3.1), b) == 2
+    @test count(isgreaterequal(8.1), b) == 0
+
+    @test count(in(1.1..1.9), b) == 0
+    @test count(in(1.1..2.1), b) == 1
+    @test count(in(1.1..3.1), b) == 2
+    @test count(in(2.1..3.1), b) == 1
+
     @test findall(isequal(1.0), b)::MaybeVector == []
     @test findall(isequal(8.0), b)::MaybeVector == [3]
     @test findall(isequal(2.0), b)::MaybeVector == [2]
@@ -69,6 +114,51 @@
     @test issetequal(filter(in(2.1..3.1), b), [3.0])
 
     c = accelerate!(a, UniqueSortIndex) # a = [2.0, 3.0, 5.0, 8.0]
+
+    @test 1.0 ∉ c
+    @test 2.0 ∈ c
+    @test 3.0 ∈ c
+    @test 4.0 ∉ c
+    @test 5.0 ∈ c
+    @test 8.0 ∈ c
+    @test 9.0 ∉ c
+
+    @test count(isequal(1.0), c) == 0
+    @test count(isequal(2.0), c) == 1
+    @test count(isequal(3.0), c) == 1
+    @test count(isequal(4.0), c) == 0
+    @test count(isequal(5.0), c) == 1
+    @test count(isequal(8.0), c) == 1
+    @test count(isequal(9.0), c) == 0
+
+    @test count(isless(1.1), c) == 0
+    @test count(isless(2.0), c) == 0
+    @test count(isless(2.1), c) == 1
+    @test count(isless(3.1), c) == 2
+    @test count(isless(8.1), c) == 4
+
+    @test count(islessequal(1.1), c) == 0
+    @test count(islessequal(2.0), c) == 1
+    @test count(islessequal(2.1), c) == 1
+    @test count(islessequal(3.1), c) == 2
+    @test count(islessequal(8.1), c) == 4
+
+    @test count(isgreater(1.1), c) == 4
+    @test count(isgreater(2.0), c) == 3
+    @test count(isgreater(2.1), c) == 3
+    @test count(isgreater(3.1), c) == 2
+    @test count(isgreater(8.1), c) == 0
+
+    @test count(isgreaterequal(1.1), c) == 4
+    @test count(isgreaterequal(2.0), c) == 4
+    @test count(isgreaterequal(2.1), c) == 3
+    @test count(isgreaterequal(3.1), c) == 2
+    @test count(isgreaterequal(8.1), c) == 0
+
+    @test count(in(1.1..1.9), c) == 0
+    @test count(in(1.1..2.1), c) == 1
+    @test count(in(1.1..3.1), c) == 2
+    @test count(in(2.1..3.1), c) == 1
 
     @test findall(isequal(1.0), c)::MaybeVector == []
     @test findall(isequal(8.0), c)::MaybeVector == [4]

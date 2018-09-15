@@ -21,6 +21,17 @@ end
 Base.summary(::UniqueHashIndex) = "UniqueHashIndex"
 
 # Accelerations
+Base.in(x, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueHashIndex}) = haskey(a.index.dict, x)
+
+function Base.count(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueHashIndex})
+    index = Base.ht_keyindex(a.index.dict, f.x)
+    if index < 0
+        return 0
+    else
+        return 1
+    end
+end
+
 function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueHashIndex})
 	index = Base.ht_keyindex(a.index.dict, f.x)
 	if index < 0

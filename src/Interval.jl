@@ -56,27 +56,64 @@ false
 ..(start::T1, stop::T2) where {T1, T2} = Interval{T1, T2}(start, stop)
 
 function Base.in(x, interval::Interval)
-    return isgreaterequal(x, interval.start) && islessequal(x, interval.stop)
+    return !(isless(x, interval.start) || isless(interval.stop, x))
 end
 
-function Base.:(==)(i1::Interval, i2::Interval)
-    (isequal(i1.start, i2.start) && isequal(i1.stop, i2.stop)) || (isless(i1.stop, i1.start) && isless(i2.stop, i2.start))
+function Base.isempty(i::Interval)
+    isless(i.stop, i.start)
 end
 
-function Base.isequal(i1::Interval, i2::Interval)
-    isequal(i1.start, i2.start) && isequal(i1.stop, i2.stop)
+function Base.:(==)(i1::Interval, i2::Interval) # isequal falls back to ==
+    if isempty(i1)
+        return isempty(i2)
+    elseif isempty(i2)
+        return false
+    else
+        return isequal(i1.start, i2.start) && isequal(i1.stop, i2.stop)
+    end
 end
 
-function Base.isless(i1::Interval, i2::Interval)
-    isless(i1.start, i2.start) || (isequal(i1.start, i2.start) && isless(i1.stop, i2.stop))
+function Base.isless(i1::Interval, i2::Interval) # < falls back to isless
+    if isempty(i1)
+        return false
+    elseif isempty(i2)
+        return true
+    else
+        return isless(i1.start, i2.start) || (isequal(i1.start, i2.start) && isless(i1.stop, i2.stop))
+    end
 end
 
-Base.hash(interval::Interval, h::UInt) = hash(interval.start, hash(interval.stop, hash(UInt === UInt64 ? 0x0c3a059de789f681 : 0x0c88d4c5, h)))
+function Base.hash(interval::Interval, h::UInt)
+    h = hash(UInt === UInt64 ? 0x0c3a059de789f681 : 0x0c88d4c5, h)
+    if isempty(interval)
+        return h
+    end
+    return hash(interval.stop, hash(interval.start, h))
+end
 
 function Base.show(io::IO, interval::Interval)
     print(io, interval.start)
     print(io, "..")
     print(io, interval.stop)
+end
+
+function Base.intersect(i1::Interval, i2::Interval)
+    max(i1.start, i2.start) .. min(i1.stop, i2.stop)
+end
+
+function Base.union(i1::Interval, i2::Interval)
+    if isless(i1.start, i2.stop)
+        error("Union of intervals is not contiguous")
+    end
+    return min(i1.start, i2.start) .. max(i1.stop, i2.stop)
+end
+
+function Base.issubset(i1::Interval, i2::Interval)
+    !(isless(i1.start, i1.start) || isless(i2.stop, i1.stop))
+end
+
+function intersects(i1::Interval, i2::Interval)
+    i1.start ∈ i2 | i1.stop ∈ i2
 end
 
 struct Exclude{T}
