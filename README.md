@@ -133,7 +133,9 @@ can be inserted at the REPL via `\in <TAB>`). For example, `3 ∈ 0 .. 10` is `t
 `13 ∈ 0 .. 10` is `false`.
 
 By default, an interval is inclusive of its endpoints, such that `10 ∈ 0 .. 10`. An endpoint
-can be excluded via the exclude function, for example `10 ∉ 0 .. exclude(10)`.
+can be excluded via the `lessthan` or `greaterthan` function, which returns a value almost equal
+to but slightly less/greater than its input. An interval exclusive of both its endpoints can be
+expressed as `greaterthan(a) .. lessthan(b)`. For example `10 ∉ 0 .. lessthan(10)`.
 
 ## Work remaining
 

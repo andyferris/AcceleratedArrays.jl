@@ -1,6 +1,6 @@
 # IntervalSets.jl currently has deprecation warnings on Julia 0.7
 
-export Interval, .., exclude, Exclude
+export Interval, .., lessthan, LessThan, greaterthan, GreaterThan
 
 """
     Interval(start, stop)
@@ -36,7 +36,8 @@ Constructs an `Interval(start, stop)`, which represents the closed interval betw
 and `stop`. `Interval`s are abstract collections which support `in` but not iteration,
 indexing, etc.
 
-To exclude either endpoint from the `Interval`, use the `exclude` function.
+The interval includes both the `start` and `stop` poitns. To exclude the `start` or `stop`
+from the `Interval`, use the `greaterthan` or `lessthan` function.
 
 # Examples
 
@@ -50,7 +51,10 @@ true
 julia> 4 in 1..3
 false
 
-julia> 3 in 1..exclude(3)
+julia> 1 in greaterthan(1)..3
+false
+
+julia> 3 in 1..lessthan(3)
 false
 """
 ..(start::T1, stop::T2) where {T1, T2} = Interval{T1, T2}(start, stop)
@@ -116,54 +120,114 @@ function intersects(i1::Interval, i2::Interval)
     i1.start ∈ i2 | i1.stop ∈ i2
 end
 
-struct Exclude{T}
+
+struct LessThan{T}
     value::T
 end
 
-function Base.show(io::IO, x::Exclude)
-    print(io, "exclude(")
+function Base.show(io::IO, x::LessThan)
+    print(io, "lessthan(")
     print(io, x.value)
     print(io, ")")
 end
 
 """
-    exclude(x)
+    lessthan(x)
 
-Return a value which excludes itself from `isequal` comparison but otherwise preserves order
-with respect to `isless`.
+Return a value which is immediately smaller than `x`. Than value is almost, but not quite,
+equal to `x` - there should be no other values (of any type) in between `x` and
+`lessthan(x)` according to Julia's `isless` and `isequal` canonical total ordering.
 
-Amongst other uses, this may be used to create `Interval`s the exclude the end points.
+Amongst other uses, this may be used to create `Interval`s that exclude the end point.
+
+See also `greaterthan`.
 
 # Examples
 
 ```julua
-julia> isequal(10, exclude(10))
+julia> isequal(lessthan(10), 10)
 false
 
-julia> isless(9, exclude(10))
+julia> isless(lessthan(10), 10)
 true
 
 julia> 10 ∈ 0..10
 true
 
-julia> 10 ∈ 0..exclude(10)
+julia> 10 ∈ 0..lessthan(10)
 false
 ```
 """
-function exclude(x)
-    Exclude{typeof(x)}(x)
+function lessthan(x)
+    LessThan{typeof(x)}(x)
 end
 
-Base.isequal(x::Exclude, y::Exclude) = isequal(x.value, y.value)
-Base.isequal(x::Exclude, y) = false
-Base.isequal(x, y::Exclude) = false
-Base.isequal(x::Exclude, y::Missing) = false
-Base.isequal(x::Missing, y::Exclude) = false
+Base.isequal(x::LessThan, y::LessThan) = isequal(x.value, y.value)
+Base.isequal(x::LessThan, y) = false
+Base.isequal(x, y::LessThan) = false
+Base.isequal(x::LessThan, y::Missing) = false
+Base.isequal(x::Missing, y::LessThan) = false
 
-Base.isless(x::Exclude, y::Exclude) = isless(x.value, y.value)
-Base.isless(x::Exclude, y) = isless(x.value, y)
-Base.isless(x, y::Exclude) = isless(x, y.value)
-Base.isless(x::Exclude, y::Missing) = true
-Base.isless(x::Missing, y::Exclude) = false
+Base.isless(x::LessThan, y::LessThan) = isless(x.value, y.value)
+Base.isless(x::LessThan, y) = islessequal(x.value, y)
+Base.isless(x, y::LessThan) = isless(x, y.value)
+Base.isless(x::LessThan, y::Missing) = true
+Base.isless(x::Missing, y::LessThan) = false
 
-Base.hash(x::Exclude, h::UInt) = hash(x.value, hash(UInt === UInt64 ? 0x1f61aad02a1ec08b : 0xd6318b8a, h))
+Base.hash(x::LessThan, h::UInt) = hash(x.value, hash(UInt === UInt64 ? 0x1f61aad02a1ec08b : 0xd6318b8a, h))
+
+
+struct GreaterThan{T}
+    value::T
+end
+
+function Base.show(io::IO, x::GreaterThan)
+    print(io, "greaterthan(")
+    print(io, x.value)
+    print(io, ")")
+end
+
+"""
+    greaterthan(x)
+
+Return a value which is immediately larger than `x`. Than value is almost, but not quite,
+equal to `x` - there should be no other values (of any type) in between `x` and
+`greaterthan(x)` according to Julia's `isless` and `isequal` canonical total ordering.
+
+Amongst other uses, this may be used to create `Interval`s that exclude the starting point.
+
+See also `lessthan`.
+
+# Examples
+
+```julua
+julia> isequal(10, greaterthan(10))
+false
+
+julia> isless(10, greaterthan(10))
+true
+
+julia> 0 ∈ 0..10
+true
+
+julia> 0 ∈ greaterthan(0)..10
+false
+```
+"""
+function greaterthan(x)
+    GreaterThan{typeof(x)}(x)
+end
+
+Base.isequal(x::GreaterThan, y::GreaterThan) = isequal(x.value, y.value)
+Base.isequal(x::GreaterThan, y) = false
+Base.isequal(x, y::GreaterThan) = false
+Base.isequal(x::GreaterThan, y::Missing) = false
+Base.isequal(x::Missing, y::GreaterThan) = false
+
+Base.isless(x::GreaterThan, y::GreaterThan) = isless(x.value, y.value)
+Base.isless(x::GreaterThan, y) = isless(x.value, y)
+Base.isless(x, y::GreaterThan) = islessequal(x, y.value)
+Base.isless(x::GreaterThan, y::Missing) = true
+Base.isless(x::Missing, y::GreaterThan) = false
+
+Base.hash(x::GreaterThan, h::UInt) = hash(x.value, hash(UInt === UInt64 ? 0x4fda09326e00a582 : 0xe4028a11, h))

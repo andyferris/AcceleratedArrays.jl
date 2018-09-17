@@ -50,3 +50,13 @@
     @test !isless(0..1, 0..0)
     @test !(isless(0 .. -1, 0..0))
 end
+
+@testset "lessthan and greaterthan" begin
+    interval = greaterthan(0) .. lessthan(1)
+
+    @test -1 ∉ interval
+    @test 0 ∉ interval
+    @test 0.5 ∈ interval
+    @test 1 ∉ interval
+    @test 2 ∉ interval
+end
