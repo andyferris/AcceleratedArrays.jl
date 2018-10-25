@@ -16,4 +16,11 @@
    @test filter(isequal(4), b) == []
 
    @test issetequal(unique(b), [1,2,3])
+
+   @test group(identity, b) == group(identity, a)
+   @test groupinds(identity, b) == groupinds(identity, a)
+   @test groupreduce(identity, +, b) == groupreduce(identity, +, a)
+
+   @test issetequal(innerjoin(identity, identity, tuple, isequal, b, [0, 1, 2]),
+                    innerjoin(identity, identity, tuple, isequal, a, [0, 1, 2]))
 end

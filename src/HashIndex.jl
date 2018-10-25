@@ -84,12 +84,31 @@ function SplitApplyCombine.group2(a::AcceleratedArray{<:Any, <:Any, <:Any, <:Has
     return Dict((key, @inbounds b[inds]) for (key, inds) in a.index.dict)
 end
 
-function SplitApplyCombine.groupreduce(::typeof(identity), op, f, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex}; kw...)
+function SplitApplyCombine.groupreduce(::typeof(identity), f, op, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex}; kw...)
 	return Dict((k, mapreduce(i -> f(@inbounds a[i]), op, v; kw...)) for (k,v) in a.index.dict)
 end
 
 function SplitApplyCombine._groupinds(a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
 	return a.index.dict
+end
+
+function SplitApplyCombine._innerjoin!(out, left::AbstractArray, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex}, v::AbstractArray, ::typeof(isequal))
+    @boundscheck if (axes(l)..., axes(r)...) != axes(v)
+        throw(DimensionMismatch("innerjoin arrays do not have matching dimensions"))
+    end
+
+    dict = right.index.dict
+
+    @inbounds for i ∈ keys(left)
+        dict_index = Base.ht_keyindex(dict, left(i_l))
+        if dict_index > 0 # -1 if key not found
+            for i_r ∈ dict.vals[dict_index]
+                push!(out, v[Tuple(i_l)..., Tuple(i_r)...])
+            end
+        end
+    end
+
+    return out
 end
 
 function SplitApplyCombine.leftgroupjoin(lkey, ::typeof(identity), f, ::typeof(isequal), left, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
@@ -111,6 +130,7 @@ function SplitApplyCombine.leftgroupjoin(lkey, ::typeof(identity), f, ::typeof(i
     return out
 end
 
+#=
 function SplitApplyCombine.innerjoin(lkey, ::typeof(identity), f, ::typeof(isequal), left, right::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
     T = promote_op(f, eltype(left), eltype(right))
     dict = right.index.dict
@@ -126,3 +146,4 @@ function SplitApplyCombine.innerjoin(lkey, ::typeof(identity), f, ::typeof(isequ
     end
     return out
 end
+=#

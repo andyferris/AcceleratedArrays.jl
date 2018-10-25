@@ -115,6 +115,9 @@
     @test issetequal(filter(in(1.1..3.1), b), [2.0, 3.0, 3.0])
     @test issetequal(filter(in(2.1..3.1), b), [3.0, 3.0])
 
+    @test issetequal(innerjoin(identity, identity, tuple, isequal, b, [1.5, 3.0, 8.0]),
+                     innerjoin(identity, identity, tuple, isequal, a, [1.5, 3.0, 8.0]))
+
     c = accelerate!(a, SortIndex) # a = [2.0, 3.0, 3.0, 8.0]
 
     @test 1.0 ∉ c
@@ -229,4 +232,7 @@
     @test issetequal(filter(in(1.1..2.1), c), [2.0])
     @test issetequal(filter(in(1.1..3.1), c), [2.0, 3.0, 3.0])
     @test issetequal(filter(in(2.1..3.1), c), [3.0, 3.0])
+
+    @test issetequal(innerjoin(identity, identity, tuple, isequal, c, [1.5, 3.0, 8.0]),
+                     innerjoin(identity, identity, tuple, isequal, a, [1.5, 3.0, 8.0]))
 end

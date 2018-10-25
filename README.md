@@ -56,9 +56,13 @@ Accelerations are fully implemented for the following functions, where `a` is an
  * `findall(pred, a)`
  * `filter(pred, a)`
 
-There is some work-in-progress on a variety of other functions, like `findfirst`,
-`findlast`, `unique`, and [SplitApplyCombine](https://github.com/JuliaData/SplitApplyCombine.jl)'s
-`group` and `innerjoin`.
+There is some work-in-progress on a variety of other functions, including some from
+[SplitApplyCombine](https://github.com/JuliaData/SplitApplyCombine.jl):
+
+ * `findfirst(pred, a)` and `findlast(pred, a)`
+ * `unique(a)`
+ * `group`, `groupinds`, `groupview` and `groupreduce`
+ * `innerjoin`
 
 Accelerations are only available for some predicates `pred`, which naturally depend on the
 acceleration index used (see below for a full set).

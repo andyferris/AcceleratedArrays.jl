@@ -14,6 +14,12 @@ Base.axes(a::MaybeVector) = (Base.OneTo(a.length),)
 Base.size(a::MaybeVector) = (a.length,)
 Base.IndexStyle(::Type{<:MaybeVector}) = IndexLinear()
 @inline function Base.getindex(a::MaybeVector, i::Integer)
+    @boundscheck if a.length != 0x01 || i != 1
+        throw(BoundsError(a, i))
+    end
+    return a.data
+end
+@inline function Base.getindex(a::MaybeVector)
     @boundscheck if a.length != 0x01
         throw(BoundsError(a, i))
     end
