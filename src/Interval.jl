@@ -223,11 +223,15 @@ Base.isequal(x::GreaterThan, y) = false
 Base.isequal(x, y::GreaterThan) = false
 Base.isequal(x::GreaterThan, y::Missing) = false
 Base.isequal(x::Missing, y::GreaterThan) = false
+Base.isequal(x::GreaterThan, y::LessThan) = false
+Base.isequal(x::LessThan, y::GreaterThan) = false
 
 Base.isless(x::GreaterThan, y::GreaterThan) = isless(x.value, y.value)
 Base.isless(x::GreaterThan, y) = isless(x.value, y)
 Base.isless(x, y::GreaterThan) = islessequal(x, y.value)
 Base.isless(x::GreaterThan, y::Missing) = true
 Base.isless(x::Missing, y::GreaterThan) = false
+Base.isless(x::GreaterThan, y::LessThan) = isless(x.value, y.value)
+Base.isless(x::LessThan, y::GreaterThan) = islessequal(x.value, y.value)
 
 Base.hash(x::GreaterThan, h::UInt) = hash(x.value, hash(UInt === UInt64 ? 0x4fda09326e00a582 : 0xe4028a11, h))
