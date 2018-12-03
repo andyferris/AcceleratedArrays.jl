@@ -174,3 +174,33 @@ end
 function Base.filter(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:SortIndex{<:LinearIndices}})
     @inbounds parent(a)[max(firstindex(parent(a)), searchsortedfirst(parent(a), f.x.start)) : min(lastindex(parent(a)), searchsortedlast(parent(a), f.x.stop))]
 end
+
+function Base.unique(a::AcceleratedArray{<:Any, <:Any, <:Any, <:SortIndex})
+    p = parent(a)
+    b = Vector{eltype(a)}() # Require that push! works, which `empty` and `similar` don't guarantee
+    o = a.index.order
+    
+    s = iterate(o)
+    if s === nothing
+        return AcceleratedArray(b, UniqueSortIndex(0, keys(b)))
+    end
+
+    (i, it) = s
+    last = @inbounds p[i]
+    push!(b, last)
+
+    s = iterate(o, it)
+    while s !== nothing
+        (i, it) = s
+        this = @inbounds p[i]
+        if isequal(this, last)
+            s = iterate(o, it)
+            continue
+        end
+        push!(b, this)
+        last = this
+        s = iterate(o, it)
+    end
+
+    return AcceleratedArray(b, UniqueSortIndex(keys(b)))
+end

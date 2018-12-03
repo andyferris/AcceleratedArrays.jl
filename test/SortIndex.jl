@@ -115,6 +115,8 @@
     @test issetequal(filter(in(1.1..3.1), b), [2.0, 3.0, 3.0])
     @test issetequal(filter(in(2.1..3.1), b), [3.0, 3.0])
 
+    @test unique(b)::AcceleratedArray{<:Any,<:Any,<:Any,<:UniqueSortIndex{<:LinearIndices}} == [2.0, 3.0, 8.0]
+
     @test issetequal(innerjoin(identity, identity, tuple, isequal, b, [1.5, 3.0, 8.0]),
                      innerjoin(identity, identity, tuple, isequal, a, [1.5, 3.0, 8.0]))
 

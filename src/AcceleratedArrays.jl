@@ -17,10 +17,10 @@ include("Interval.jl")
 include("AbstractIndex.jl")
 include("AcceleratedArray.jl")
 include("UniqueIndex.jl")
-include("HashIndex.jl")
 include("UniqueHashIndex.jl")
-include("SortIndex.jl")
+include("HashIndex.jl")
 include("UniqueSortIndex.jl")
+include("SortIndex.jl")
 
 end # module
 
