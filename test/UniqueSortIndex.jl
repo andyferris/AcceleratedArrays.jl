@@ -80,6 +80,14 @@
     @test issetequal(findall(in(1.1..3.1), b), [1, 2])
     @test issetequal(findall(in(2.1..3.1), b), [1])
 
+    @test findfirst(isequal(1.0), b) === nothing
+    @test findfirst(isequal(8.0), b) === 3
+    @test findfirst(isequal(2.0), b) === 2
+
+    @test findlast(isequal(1.0), b) === nothing
+    @test findlast(isequal(8.0), b) === 3
+    @test findlast(isequal(2.0), b) === 2
+
     @test filter(isequal(1.0), b)::MaybeVector == []
     @test filter(isequal(8.0), b)::MaybeVector == [8.0]
     @test filter(isequal(2.0), b)::MaybeVector == [2.0]
@@ -195,6 +203,72 @@
     @test issetequal(findall(in(1.1..2.1), c), [1])
     @test issetequal(findall(in(1.1..3.1), c), [1, 2])
     @test issetequal(findall(in(2.1..3.1), c), [2])
+
+    @test findfirst(isequal(1.0), c) === nothing
+    @test findfirst(isequal(8.0), c) === 4
+    @test findfirst(isequal(2.0), c) === 1
+
+    @test findfirst(isless(1.1), c) === nothing
+    @test findfirst(isless(2.0), c) === nothing
+    @test findfirst(isless(2.1), c) === 1
+    @test findfirst(isless(3.1), c) === 1
+    @test findfirst(isless(8.1), c) === 1
+
+    @test findfirst(islessequal(1.1), c) === nothing
+    @test findfirst(islessequal(2.0), c) === 1
+    @test findfirst(islessequal(2.1), c) === 1
+    @test findfirst(islessequal(3.1), c) === 1
+    @test findfirst(islessequal(8.1), c) === 1
+
+    @test findfirst(isgreater(1.1), c) === 1
+    @test findfirst(isgreater(2.0), c) === 2
+    @test findfirst(isgreater(2.1), c) === 2
+    @test findfirst(isgreater(3.1), c) === 3
+    @test findfirst(isgreater(8.1), c) === nothing
+
+    @test findfirst(isgreaterequal(1.1), c) === 1
+    @test findfirst(isgreaterequal(2.0), c) === 1
+    @test findfirst(isgreaterequal(2.1), c) === 2
+    @test findfirst(isgreaterequal(3.1), c) === 3
+    @test findfirst(isgreaterequal(8.1), c) === nothing
+
+    @test findfirst(in(1.1..1.9), c) === nothing
+    @test findfirst(in(1.1..2.1), c) === 1
+    @test findfirst(in(1.1..3.1), c) === 1
+    @test findfirst(in(2.1..3.1), c) === 2
+
+    @test findlast(isequal(1.0), c) === nothing
+    @test findlast(isequal(8.0), c) === 4
+    @test findlast(isequal(2.0), c) === 1
+
+    @test findlast(isless(1.1), c) === nothing
+    @test findlast(isless(2.0), c) === nothing
+    @test findlast(isless(2.1), c) === 1
+    @test findlast(isless(3.1), c) === 2
+    @test findlast(isless(8.1), c) === 4
+
+    @test findlast(islessequal(1.1), c) === nothing
+    @test findlast(islessequal(2.0), c) === 1
+    @test findlast(islessequal(2.1), c) === 1
+    @test findlast(islessequal(3.1), c) === 2
+    @test findlast(islessequal(8.1), c) === 4
+
+    @test findlast(isgreater(1.1), c) === 4
+    @test findlast(isgreater(2.0), c) === 4
+    @test findlast(isgreater(2.1), c) === 4
+    @test findlast(isgreater(3.1), c) === 4
+    @test findlast(isgreater(8.1), c) === nothing
+
+    @test findlast(isgreaterequal(1.1), c) === 4
+    @test findlast(isgreaterequal(2.0), c) === 4
+    @test findlast(isgreaterequal(2.1), c) === 4
+    @test findlast(isgreaterequal(3.1), c) === 4
+    @test findlast(isgreaterequal(8.1), c) === nothing
+
+    @test findlast(in(1.1..1.9), c) === nothing
+    @test findlast(in(1.1..2.1), c) === 1
+    @test findlast(in(1.1..3.1), c) === 2
+    @test findlast(in(2.1..3.1), c) === 2
 
     @test filter(isequal(1.0), c)::MaybeVector == []
     @test filter(isequal(8.0), c)::MaybeVector == [8.0]

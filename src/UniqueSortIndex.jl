@@ -198,3 +198,134 @@ end
 function Base.filter(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
     @inbounds parent(a)[max(firstindex(parent(a)), searchsortedfirst(parent(a), f.x.start)) : min(lastindex(parent(a)), searchsortedlast(parent(a), f.x.stop))]
 end
+
+
+# We mostly accelerate these where the array order is sorted - exhaustive search of matching
+# indices could be slower than starting at the beginning of the array,
+function Base.findfirst(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    i = searchsortedfirst(@inbounds(view(parent(a), a.index.order)), f.x)
+    @inbounds if i > lastindex(a.index.order) || !f(parent(a)[a.index.order[i]])
+        return nothing
+    else
+        return a.index.order[i]
+    end
+end
+
+function Base.findfirst(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedfirst(parent(a), f.x)
+    @inbounds if i > lastindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+function Base.findfirst(f::Fix2{typeof(isless)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    if isempty(a.parent) || !f(first(a))
+        return nothing
+    else
+        return firstindex(a.parent)
+    end
+end
+
+function Base.findfirst(f::Fix2{typeof(islessequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    if isempty(a.parent) || !f(first(a))
+        return nothing
+    else
+        return firstindex(a.parent)
+    end
+end
+
+function Base.findfirst(f::Fix2{typeof(isgreater)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedfirstgreater(parent(a), f.x)
+    @inbounds if i > lastindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+function Base.findfirst(f::Fix2{typeof(isgreaterequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedfirst(parent(a), f.x)
+    @inbounds if i > lastindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+function Base.findfirst(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedfirst(parent(a), f.x.start)
+    @inbounds if i > lastindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+
+# We mostly accelerate these where the array order is sorted
+function Base.findlast(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex})
+    i = searchsortedlast(@inbounds(view(parent(a), a.index.order)), f.x)
+    @inbounds if i < firstindex(a.index.order) || !f(parent(a)[a.index.order[i]])
+        return nothing
+    else
+        return a.index.order[i]
+    end
+end
+
+function Base.findlast(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedlast(parent(a), f.x)
+    @inbounds if i < firstindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+function Base.findlast(f::Fix2{typeof(isless)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedlastless(parent(a), f.x)
+    @inbounds if i < firstindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+function Base.findlast(f::Fix2{typeof(islessequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedlast(parent(a), f.x)
+    @inbounds if i < firstindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+function Base.findlast(f::Fix2{typeof(isgreater)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    if isempty(a.parent) || !f(last(a))
+        return nothing
+    else
+        return lastindex(a.parent)
+    end
+end
+
+function Base.findlast(f::Fix2{typeof(isgreaterequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    if isempty(a.parent) || !f(last(a))
+        return nothing
+    else
+        return lastindex(a.parent)
+    end
+end
+
+function Base.findlast(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:UniqueSortIndex{<:LinearIndices}})
+    i = searchsortedlast(parent(a), f.x.stop)
+    @inbounds if i < firstindex(parent(a)) || !f(parent(a)[i])
+        return nothing
+    else
+        return i
+    end
+end
+
+# TODO - Grouping
+#      - Sort-merge joins
+#      - Sorted indexing preserves sortedness (including at least unit ranges)
