@@ -4,11 +4,13 @@ using SplitApplyCombine
 
 @test isempty(detect_ambiguities(Base, AcceleratedArrays))
 
-include("Interval.jl")
-include("MaybeVector.jl")
-include("SingleVector.jl")
+@testset "AcceleratedArrays" begin
+    include("Interval.jl")
+    include("MaybeVector.jl")
+    include("SingleVector.jl")
 
-include("HashIndex.jl")
-include("UniqueHashIndex.jl")
-include("SortIndex.jl")
-include("UniqueSortIndex.jl")
+    include("HashIndex.jl")
+    include("UniqueHashIndex.jl")
+    include("SortIndex.jl")
+    include("UniqueSortIndex.jl")
+end
