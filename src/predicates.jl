@@ -50,8 +50,11 @@ Base.isless(x) = Fix2(isless, x)
 islessequal(x) = Fix2(islessequal, x)
 isgreater(x) = Fix2(isgreater, x)
 isgreaterequal(x) = Fix2(isgreaterequal, x)
-Base.:(<)(x) = Fix2(<, x)
-Base.:(<=)(x) = Fix2(<=, x)
-Base.:(>)(x) = Fix2(>, x)
-Base.:(>=)(x) = Fix2(>=, x)
-Base.:(!=)(x) = Fix2(!=, x)
+if VERSION < v"1.2.0-DEV.257"
+    # Added to Base in https://github.com/JuliaLang/julia/pull/30915
+    Base.:(<)(x) = Fix2(<, x)
+    Base.:(<=)(x) = Fix2(<=, x)
+    Base.:(>)(x) = Fix2(>, x)
+    Base.:(>=)(x) = Fix2(>=, x)
+    Base.:(!=)(x) = Fix2(!=, x)
+end
