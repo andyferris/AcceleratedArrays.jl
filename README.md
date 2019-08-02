@@ -6,7 +6,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/9qwb219wpdm3dg3c?svg=true)](https://ci.appveyor.com/project/andyferris/acceleratedarrays-jl)
 [![codecov](https://codecov.io/gh/andyferris/AcceleratedArrays.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/andyferris/AcceleratedArrays.jl)
 
-**AcceleratedArrays** provides (seconday) acceleration indexes for Julia `AbstractArray`s. Such
+**AcceleratedArrays** provides (secondary) acceleration indexes for Julia `AbstractArray`s. Such
 acceleration indexes can be used to speed up certain operations, particularly those
 involving searching through the values - for example, an `AcceleratedArray` may have more
 efficient implementations of functions such as `findall`, `filter`, and `unique`.
