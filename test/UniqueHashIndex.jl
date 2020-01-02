@@ -19,7 +19,7 @@
     @test unique(b) === b
 
     @test group(iseven, b) == group(iseven, a)
-    @test groupinds(iseven, b) == groupinds(iseven, a)
+    @test groupfind(iseven, b) == groupfind(iseven, a)
     @test groupreduce(iseven, +, b) == groupreduce(iseven, +, a)
 
     @test issetequal(innerjoin(identity, identity, tuple, isequal, b, [0, 1, 2]),
