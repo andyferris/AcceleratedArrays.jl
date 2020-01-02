@@ -1,8 +1,8 @@
 module AcceleratedArrays
 
-using SplitApplyCombine
+using SplitApplyCombine, Dictionaries
 
-using Base: @propagate_inbounds, Fix2, promote_op
+using Base: @propagate_inbounds, Fix2, promote_op, Callable
 
 export accelerate, accelerate!
 export AcceleratedArray, AcceleratedVector, AcceleratedMatrix, MaybeVector, SingleVector

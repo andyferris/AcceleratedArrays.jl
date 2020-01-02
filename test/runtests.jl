@@ -1,8 +1,9 @@
 using Test
 using AcceleratedArrays
 using SplitApplyCombine
+using Dictionaries
 
-@test isempty(detect_ambiguities(Base, AcceleratedArrays))
+@test isempty(setdiff(detect_ambiguities(Base, AcceleratedArrays, Dictionaries), detect_ambiguities(Base, Dictionaries) ))
 
 @testset "AcceleratedArrays" begin
     include("Interval.jl")
