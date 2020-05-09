@@ -1,4 +1,3 @@
-
 struct UniqueSortIndex{O <: AbstractVector} <: AbstractUniqueIndex
 	order::O
 end
@@ -21,6 +20,14 @@ function accelerate!(a::AbstractArray, ::Type{UniqueSortIndex})
 	    end
 	end
     return AcceleratedArray(a, UniqueSortIndex(keys(a)))
+end
+
+function accelerate(a::AbstractVector, ::Type{UniqueSortIndex}, check::Bool)
+    if check
+        accelerate(a, UniqueSortIndex)
+    else
+        AcceleratedArray(a, UniqueSortIndex(Base.OneTo(length(a))))
+    end
 end
 
 Base.summary(::UniqueSortIndex) = "UniqueSortIndex"
