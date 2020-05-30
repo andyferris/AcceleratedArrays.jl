@@ -326,12 +326,12 @@ function Base.findlast(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:An
     end
 end
 
-function Base.getindex(a::AcceleratedVector{<:Any, <:Any, <:UniqueSortIndex{<:Base.OneTo}}, ind::UnitRange{Int})
+Base.@propagate_inbounds function Base.getindex(a::AcceleratedVector{<:Any, <:Any, <:UniqueSortIndex{<:Base.OneTo}}, ind::AbstractUnitRange{Int})
     a_i = getindex(parent(a), ind)
     AcceleratedArray(a_i, UniqueSortIndex(Base.OneTo(length(a_i))))
 end
 
-function Base.view(a::AcceleratedVector{<:Any, <:Any, <:UniqueSortIndex{<:Base.OneTo}}, ind::UnitRange{Int})
+Base.@propagate_inbounds function Base.view(a::AcceleratedVector{<:Any, <:Any, <:UniqueSortIndex{<:Base.OneTo}}, ind::AbstractUnitRange{Int})
     a_i = view(parent(a), ind)
     AcceleratedArray(a_i, UniqueSortIndex(Base.OneTo(length(a_i))))
 end
