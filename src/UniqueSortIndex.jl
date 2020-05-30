@@ -333,6 +333,19 @@ function Base.findlast(f::Fix2{typeof(in), <:Interval}, a::AcceleratedArray{<:An
     end
 end
 
+Base.@propagate_inbounds function Base.getindex(a::AcceleratedVector{<:Any, <:Any, <:UniqueSortIndex{<:Base.OneTo}}, ind::AbstractUnitRange{Int})
+    a_i = getindex(parent(a), ind)
+    AcceleratedArray(a_i, UniqueSortIndex(Base.OneTo(length(a_i))))
+end
+
+Base.@propagate_inbounds function Base.view(a::AcceleratedVector{<:Any, <:Any, <:UniqueSortIndex{<:Base.OneTo}}, ind::AbstractUnitRange{Int})
+    a_i = view(parent(a), ind)
+    AcceleratedArray(a_i, UniqueSortIndex(Base.OneTo(length(a_i))))
+end
+
 # TODO - Grouping
 #      - Sort-merge joins
-#      - Sorted indexing preserves sortedness (including at least unit ranges)
+#      - Sorted indexing with StepRanges. Have to check step is positive and branch, so not type stable.
+#        Could allow a wrapper PositiveStep(steprange) that either returns a StepRange or errors, and is therefore type-stable
+#        Users could then index their AcceleratedArrays with PositiveStep(range) if they cared about stability
+#      - Sorted indexing with other known-sorted arrays of integers.
