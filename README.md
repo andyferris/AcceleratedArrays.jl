@@ -2,8 +2,7 @@
 
 *Arrays with acceleration indices.*
 
-[![Build Status](https://travis-ci.org/andyferris/AcceleratedArrays.jl.svg?branch=master)](https://travis-ci.org/andyferris/AcceleratedArrays.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/9qwb219wpdm3dg3c?svg=true)](https://ci.appveyor.com/project/andyferris/acceleratedarrays-jl)
+![Test Status](https://github.com/andyferris/AcceleratedArrays.jl/workflows/Test/badge.svg)
 [![codecov](https://codecov.io/gh/andyferris/AcceleratedArrays.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/andyferris/AcceleratedArrays.jl)
 
 **AcceleratedArrays** provides (secondary) acceleration indexes for Julia `AbstractArray`s. Such
