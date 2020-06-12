@@ -1,10 +1,10 @@
 # Hash table acceleration index
-struct HashIndex{D <: HashDictionary} <: AbstractIndex
+struct HashIndex{D <: Dictionary} <: AbstractIndex
     dict::D
 end
 
 function HashIndex(a::AbstractArray)
-    dict = HashDictionary{eltype(a), Vector{eltype(keys(a))}}()
+    dict = Dictionary{eltype(a), Vector{eltype(keys(a))}}()
     
     @inbounds for i in keys(a)
         value = a[i]
@@ -116,7 +116,7 @@ function SplitApplyCombine.leftgroupjoin(lkey, ::typeof(identity), f, ::typeof(i
     K = promote_op(lkey, eltype(left))
 
     dict = right.index.dict
-    out = HashDictionary{K, Vector{T}}()
+    out = Dictionary{K, Vector{T}}()
     for a ∈ left
         key = lkey(a)
         group = get!(() -> T[], out, key)
