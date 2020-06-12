@@ -1,10 +1,10 @@
 # Hash table acceleration index
-struct UniqueHashIndex{D <: HashDictionary} <: AbstractUniqueIndex
+struct UniqueHashIndex{D <: Dictionary} <: AbstractUniqueIndex
     dict::D
 end 
 
 function UniqueHashIndex(a::AbstractArray)
-    dict = HashDictionary{eltype(a), SingleVector{eltype(keys(a))}}()
+    dict = Dictionary{eltype(a), SingleVector{eltype(keys(a))}}()
 
     @inbounds for i in keys(a)
         value = a[i]
