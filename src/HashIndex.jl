@@ -32,6 +32,26 @@ function Base.count(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, 
     end
 end
 
+function Base.count(f::Fix2{typeof(==)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
+    out = 0
+
+    for x in other_equal(f.x) # Search for other things that might be == but not isequal (like -0.0)
+        (hasindex, token) = gettoken(a.index.dict, x)
+        @inbounds if hasindex
+            out += length(@inbounds gettokenvalue(a.index.dict, token))
+        end
+    end
+
+    if f(f.x) # Exclude things that are not == to themselves (like NaN)
+        (hasindex, token) = gettoken(a.index.dict, f.x)
+        if hasindex
+            return out + length(@inbounds gettokenvalue(a.index.dict, token))
+        end
+    end
+
+    return out
+end
+
 function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
     (hasindex, token) = gettoken(a.index.dict, f.x)
     if hasindex
@@ -39,6 +59,33 @@ function Base.findall(f::Fix2{typeof(isequal)}, a::AcceleratedArray{<:Any, <:Any
     else
         return Vector{eltype(keys(a))}()
     end
+end
+
+function Base.findall(f::Fix2{typeof(==)}, a::AcceleratedArray{<:Any, <:Any, <:Any, <:HashIndex})
+    out = Vector{keytype(a)}()
+    n_matches = 0
+
+    for x in other_equal(f.x) # Search for other things that might be == but not isequal (like -0.0)
+        (hasindex, token) = gettoken(a.index.dict, x)
+        @inbounds if hasindex
+            append!(out, @inbounds gettokenvalue(a.index.dict, token))
+            n_matches += 1
+        end
+    end
+    
+    if f(f.x) # Exclude things that are not == to themselves (like NaN)
+        (hasindex, token) = gettoken(a.index.dict, f.x)
+        if hasindex
+            append!(out, @inbounds gettokenvalue(a.index.dict, token))
+            n_matches += 1
+        end
+    end
+
+    if n_matches > 1
+        sort!(out)
+    end
+
+    return out
 end
 
 # TODO: findall for arbitrary predicates by just checking each unique key? (Sometimes faster, sometimes slower?)
