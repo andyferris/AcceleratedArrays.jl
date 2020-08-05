@@ -58,3 +58,16 @@ if VERSION < v"1.2.0-DEV.257"
     Base.:(>=)(x) = Fix2(>=, x)
     Base.:(!=)(x) = Fix2(!=, x)
 end
+
+# Search for other things that are == but not isequal (for example -0.0)
+other_equal(::Any) = ()
+other_equal(x::AbstractFloat) = isequal(x, 0.0) ? MaybeVector(convert(typeof(x), -0.0)) : isequal(x, -0.0) ? MaybeVector(convert(typeof(x), 0.0)) : MaybeVector{typeof(x)}()
+
+# ismissing
+Base.count(f::typeof(ismissing), a::AcceleratedArray) = count(isequal(missing), a)
+Base.findall(f::typeof(ismissing), a::AcceleratedArray) = findall(isequal(missing), a)
+Base.findfirst(f::typeof(ismissing), a::AcceleratedArray) = findfirst(isequal(missing), a)
+Base.findlast(f::typeof(ismissing), a::AcceleratedArray) = findlast(isequal(missing), a)
+Base.filter(f::typeof(ismissing), a::AcceleratedArray) = filter(isequal(missing), a)
+
+# TODO isnan, iszero, isone, isfinite (all are slightly strange when considering things like Complex, Matrix and String)
