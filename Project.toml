@@ -16,4 +16,4 @@ test = ["Test"]
 [compat]
 julia = "1"
 SplitApplyCombine = "1"
-Dictionaries = "0.3, 04"
+Dictionaries = "0.3, 0.4"
