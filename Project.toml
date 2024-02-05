@@ -1,7 +1,7 @@
 authors = ["Andy Ferris <ferris.andy@gmail.com>"]
 name = "AcceleratedArrays"
 uuid = "44e12807-9a19-5591-91cf-c1b4fb89ce64"
-version = "0.3.2"
+version = "0.3.3"
 
 [deps]
 SplitApplyCombine = "03a91e81-4c3e-53e1-a0a4-9c0c8f19dd66"
